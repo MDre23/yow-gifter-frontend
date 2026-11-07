@@ -5,10 +5,7 @@ export default function Manifesto() {
         <div className="bg-white rounded-3xl p-6 lg:p-12 shadow-sm border border-slate-100">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-7 space-y-4">
-              <div className="inline-flex items-center gap-1.5 text-emerald-800 text-xs bg-emerald-50 border border-emerald-200/80 px-4 py-1 rounded-full font-semibold">
-                <img src="/icons/shield-alt-solid.svg" alt="Sécurité" className="w-4 h-4" />
-                <span>Charte &amp; Confiance</span>
-              </div>
+              
               <h2 className="text-2xl lg:text-3xl text-slate-900 font-bold">Un cadre numérique éthique, transparent et sécurisé</h2>
               <p className="text-sm text-slate-600 leading-relaxed">
                 Conçue pour favoriser la solidarité de proximité, le réemploi écologique et l'accès universel aux biens essentiels sans échange financier.

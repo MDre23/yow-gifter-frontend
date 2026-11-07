@@ -10,7 +10,7 @@ export default function HowItWorks() {
     <section className="py-16 bg-white" id="comment-ca-marche">
       <div className="max-w-7xl mx-auto px-4 sm:px-8">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-xs uppercase tracking-wider text-emerald-700 font-bold">Protocole simple &amp; transparent</span>
+          
           <h2 className="text-2xl lg:text-3xl text-slate-900 mt-1 font-bold">Le cycle de don en 4 étapes simples</h2>
           <p className="text-sm text-slate-600 mt-2">Pensé pour éliminer les spéculations et préserver la tranquillité des donateurs et demandeurs.</p>
         </div>

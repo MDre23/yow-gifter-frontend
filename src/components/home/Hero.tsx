@@ -12,7 +12,7 @@ export default function Hero() {
           className="w-full h-full object-cover object-center"
         />
         {/* Overlay pour lisibilité du texte */}
-        <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px]"></div>
+        <div className="absolute inset-0 bg-black/30 backdrop-blur-[1.5px]"></div>
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-8 w-full py-16 lg:py-24">
@@ -22,16 +22,16 @@ export default function Hero() {
           <div className="lg:col-span-7 space-y-6 text-left">
             
 
-            <h1 className="text-3xl sm:text-4xl lg:text-[3.25rem] lg:leading-[3.75rem] tracking-tight font-bold text-slate-900">
+            <h1 className="text-3xl sm:text-4xl lg:text-[3.25rem] lg:leading-[3.75rem] tracking-tight font-bold text-slate-50 lg:text-slate-900">
               Donnez une seconde vie à vos objets.{" "}
               <br className="hidden sm:inline" />
-              <span className="text-emerald-900 lg:text-emerald-700 font-extrabold">
+              <span className="text-emerald-200 lg:text-emerald-700 font-extrabold">
                 100% Gratuit
               </span>
               , 100% Solidaire.
             </h1>
 
-            <p className="text-base sm:text-lg text-slate-900 lg:text-slate-800 max-w-2xl leading-relaxed">
+            <p className="text-base sm:text-lg text-slate-100 lg:text-slate-800 max-w-2xl leading-relaxed">
               Rejoignez la communauté pour donner et recevoir des objets du
               quotidien sans intermédiaire marchand. Zéro frais, zéro
               commission, 100% gratuit.
