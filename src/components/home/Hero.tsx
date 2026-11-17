@@ -20,7 +20,6 @@ export default function Hero() {
           
           {/* ===== CÔTÉ GAUCHE : Textes ===== */}
           <div className="lg:col-span-7 space-y-6 text-left">
-            
 
             <h1 className="text-3xl sm:text-4xl lg:text-[3.25rem] lg:leading-[3.75rem] tracking-tight font-bold text-slate-50 lg:text-slate-900">
               Donnez une seconde vie à vos objets.{" "}
@@ -39,7 +38,7 @@ export default function Hero() {
 
             <div className="flex flex-wrap items-center justify-start gap-4 pt-2">
               <Link
-                href="#donner"
+                href="/auth"
                 className="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-8 py-3.5 rounded-xl shadow-md transition-all font-bold"
               >
                 <img

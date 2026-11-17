@@ -20,7 +20,7 @@ export default function Header() {
           {/* Bouton Menu Mobile */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-slate-100"
+            className="md:hidden p-2 rounded-lg hover:bg-slate-100 cursor-pointer"
             aria-label="Menu"
           >
             {isOpen ? (
@@ -30,27 +30,30 @@ export default function Header() {
             )}
           </button>
 
-          {/* Actions Desktop */}
+          {/* Actions Desktop : Menant impérativement vers /auth */}
           <div className="hidden md:flex items-center gap-3">
             <Link
-              href="#donner"
-              className="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-2.5 rounded-lg font-semibold"
+              href="/auth"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white text-sm px-4 py-2.5 rounded-lg font-semibold transition-all shadow-xs"
             >
               Donner un objet
             </Link>
             <Link
-              href="#"
-              className="text-emerald-800 hover:bg-emerald-50 text-sm px-3 py-2 rounded-lg"
+              href="/auth"
+              className="text-emerald-800 hover:bg-emerald-50 text-sm px-3 py-2 rounded-lg transition-colors font-medium"
             >
               Se connecter
             </Link>
           </div>
         </div>
 
-        {/* Navigation Desktop */}
+        {/* Navigation Desktop du site vitrine */}
         <nav className="hidden md:flex gap-2 pb-3">
           <Link href="/" className="px-4 py-1.5 bg-emerald-600 text-white text-sm font-semibold rounded-full">
             Accueil
+          </Link>
+          <Link href="#dons-disponibles" className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-emerald-50 rounded-full">
+            Dons disponibles
           </Link>
           <Link href="#livres" className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-emerald-50 rounded-full">
             Livres
@@ -80,6 +83,9 @@ export default function Header() {
             <Link href="/" onClick={() => setIsOpen(false)} className="px-4 py-3 rounded-lg text-sm font-semibold bg-emerald-50 text-emerald-700">
               Accueil
             </Link>
+            <Link href="#dons-disponibles" onClick={() => setIsOpen(false)} className="px-4 py-3 rounded-lg text-sm text-slate-700 hover:bg-slate-50">
+              Dons disponibles
+            </Link>
             <Link href="#livres" onClick={() => setIsOpen(false)} className="px-4 py-3 rounded-lg text-sm text-slate-700 hover:bg-slate-50">
               Livres
             </Link>
@@ -102,14 +108,14 @@ export default function Header() {
             <div className="border-t border-slate-100 my-3"></div>
 
             <Link
-              href="#donner"
+              href="/auth"
               onClick={() => setIsOpen(false)}
               className="block text-center bg-emerald-600 text-white text-sm font-semibold px-4 py-3 rounded-lg"
             >
               Donner un objet
             </Link>
             <Link
-              href="#"
+              href="/auth"
               onClick={() => setIsOpen(false)}
               className="block text-center text-emerald-800 text-sm font-medium px-4 py-3 rounded-lg hover:bg-emerald-50"
             >

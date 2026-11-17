@@ -17,10 +17,7 @@ export default function CTA() {
           />
         </div>
 
-        
-        
-        {/* Colonne Droite : Image img_chaine.png */}
-     
+        {/* Colonne Droite */}
         <div className="lg:col-span-8 text-center lg:text-left space-y-6">
           <div className="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm px-4 py-1 rounded-full text-xs">
             <img src="/icons/heart-solid.svg" alt="Cœur" className="w-3.5 h-3.5 filter invert" />
@@ -28,7 +25,7 @@ export default function CTA() {
           </div>
           
           <h2 className="text-3xl lg:text-[2.75rem] font-bold text-white tracking-tight leading-tight">
-            Un objet encombrant qui pourrait aider un voisin ? Des vêtements et de la nourriture qui pour les associations ? 
+            Un objet encombrant qui pourrait aider un voisin ? Des manuels ou du matériel pour les étudiants ? 
           </h2>
           
           <p className="text-base text-emerald-50 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
@@ -36,25 +33,25 @@ export default function CTA() {
           </p>
           
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-            <Link href="#publier" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#b8f7e4] hover:bg-white text-emerald-950 text-sm px-8 py-4 rounded-xl shadow-lg transition-transform active:scale-95 font-bold">
+            <Link href="/auth" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#b8f7e4] hover:bg-white text-emerald-950 text-sm px-8 py-4 rounded-xl shadow-lg transition-transform active:scale-95 font-bold">
               <img src="/icons/file-upload-solid.svg" alt="Publier" className="w-4 h-4" />
               <span>Publier mon premier don maintenant</span>
             </Link>
             <Link href="#comment-ca-marche" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white/15 hover:bg-white/25 text-white border border-white/30 text-sm px-6 py-4 rounded-xl transition-colors font-semibold">
-              <img src="/icons/question-circle-solid.svg" alt="Aide" className="w-4 h-4 filter invert" />
+              <img src="/icons/compass-solid.svg" alt="Guide" className="w-4 h-4 filter invert" />
               <span>Consulter le guide pratique</span>
             </Link>
           </div>
 
           <div className="pt-4 flex flex-wrap justify-center lg:justify-start items-center gap-6 text-emerald-100 text-xs">
             <span className="flex items-center gap-1.5">
-              <img src="/icons/check-solid.svg" alt="Check" className="w-3.5 h-3.5 filter invert" /> Inscription gratuite instantanée
+              <img src="/icons/check-solid.svg" alt="Check" className="w-3.5 h-3.5 filter invert" /> 100% Gratuit
             </span>
             <span className="flex items-center gap-1.5">
-              <img src="/icons/check-solid.svg" alt="Check" className="w-3.5 h-3.5 filter invert" /> Aucune commission cachée
+              <img src="/icons/check-solid.svg" alt="Check" className="w-3.5 h-3.5 filter invert" /> Règle FIFO équitable
             </span>
             <span className="flex items-center gap-1.5">
-              <img src="/icons/check-solid.svg" alt="Check" className="w-3.5 h-3.5 filter invert" /> Respect de l'éthique citoyenne
+              <img src="/icons/check-solid.svg" alt="Check" className="w-3.5 h-3.5 filter invert" /> Respect strict de la vie privée
             </span>
           </div>
         </div>
