@@ -35,16 +35,12 @@ export default function AppHeader() {
         
         {/* Logo */}
         <div className="flex items-center gap-4 shrink-0">
-          <Link href="/explorer" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-[#a3f2d8] flex items-center justify-center text-[#004e3e] shadow-[0_2px_6px_rgba(13,104,84,0.12)]">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-6 h-6 fill-current text-[#004e3e]"
-                viewBox="0 0 24 24"
-              >
-                <path d="M12 3a9 9 0 0 0-9 9c0 4.97 4.03 9 9 9s9-4.03 9-9c0-4.97-4.03-9-9-9zm0 16c-3.86 0-7-3.14-7-7 0-2.38 1.19-4.47 3-5.74V10c0 2.21 1.79 4 4 4s4-1.79 4-4V6.26c1.81 1.27 3 3.36 3 5.74 0 3.86-3.14 7-7 7z" />
-              </svg>
-            </div>
+          <Link href="/explorer" className="flex items-center gap-2.5 group">
+            <img
+              src="/images/logo.png"
+              alt="Logo Yow Gifter"
+              className="h-10 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
+            />
             <span className="font-bold text-[#004e3e] text-xl tracking-tight leading-none">
               Yow Gifter
             </span>
@@ -225,7 +221,7 @@ export default function AppHeader() {
             onClick={() => setIsOpen(false)}
             className="block text-center text-slate-600 text-xs py-2 hover:underline"
           >
-            Mon profil & Paramètres (Alex K. • Melen UY1)
+            Mon profil &amp; Paramètres (Alex K. • Melen UY1)
           </Link>
         </div>
       )}

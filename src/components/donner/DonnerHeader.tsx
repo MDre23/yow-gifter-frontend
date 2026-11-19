@@ -23,15 +23,12 @@ export default function DonnerHeader({ photoCount }: DonnerHeaderProps) {
       {/* En-tête */}
       <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-xs border border-slate-100 mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold mb-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
-            Partage citoyen
-          </div>
+          
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             Donner un objet
           </h1>
           <p className="text-slate-500 text-sm mt-1">
-            Offrez une seconde vie à vos objets encore utilisables auprès de vos voisins et de votre communauté.
+            Offrez une seconde vie à vos objets encore utilisables auprès de ceux qui en ont besoin.
           </p>
         </div>
 

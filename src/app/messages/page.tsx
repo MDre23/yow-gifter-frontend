@@ -111,15 +111,11 @@ export default function MessagesPage() {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-                  Messagerie Privée
+                  Conversation
                 </h1>
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold">
-                  Canal Direct
-                </span>
+               
               </div>
-              <p className="text-slate-500 text-xs mt-1">
-                Espace sécurisé pour organiser la remise en main propre de l&apos;objet.
-              </p>
+          
             </div>
 
             {/* Statut clôture transactionnelle */}

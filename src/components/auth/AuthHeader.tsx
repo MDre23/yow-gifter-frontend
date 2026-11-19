@@ -5,7 +5,12 @@ export default function AuthHeader() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 h-16 flex items-center justify-between">
         {/* Logo → Accueil */}
-        <Link href="/" className="flex items-center gap-2 group">
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <img
+            src="/images/logo.png"
+            alt="Logo Yow Gifter"
+            className="h-9 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
+          />
           <span className="font-bold text-emerald-700 text-xl tracking-tight group-hover:text-emerald-800 transition-colors">
             Yow Gifter
           </span>

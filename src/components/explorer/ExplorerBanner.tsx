@@ -9,16 +9,11 @@ export default function ExplorerBanner({
 }: ExplorerBannerProps) {
   return (
     <div className="max-w-3xl">
-      <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold mb-2">
-        <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
-        Catalogue solidaire
-      </span>
+      
       <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
         Explorer les dons disponibles
       </h1>
-      <p className="text-slate-500 text-sm mt-1">
-        Trouvez ce dont vous avez besoin auprès de votre communauté citoyenne.
-      </p>
+      
 
       {/* Barre de recherche */}
       <div className="mt-6 relative">

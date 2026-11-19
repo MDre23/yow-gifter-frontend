@@ -36,7 +36,7 @@ export default function ChatWindow({
             </h3>
             <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              En ligne • Canal direct privé
+              En ligne 
             </span>
           </div>
         </div>

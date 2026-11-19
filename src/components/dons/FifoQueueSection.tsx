@@ -29,7 +29,7 @@ export default function FifoQueueSection({
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-extrabold">
-              <span className="w-2 h-2 rounded-full bg-emerald-600 animate-ping"></span>
+             
               Bénéficiaire Prioritaire (Rang #1)
             </span>
             <span className="text-xs font-mono font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">

@@ -13,8 +13,15 @@ export default function Header() {
         <div className="h-16 flex items-center justify-between">
           
           {/* Logo */}
-          <Link href="/" className="font-bold text-emerald-700 text-xl">
-            Yow Gifter
+          <Link href="/" className="inline-flex items-center gap-2.5 group shrink-0">
+            <img
+              src="/images/logo.png"
+              alt="Logo Yow Gifter"
+              className="h-9 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
+            />
+            <span className="font-bold text-emerald-700 text-xl tracking-tight">
+              Yow Gifter
+            </span>
           </Link>
 
           {/* Bouton Menu Mobile */}

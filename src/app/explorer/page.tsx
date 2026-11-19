@@ -147,10 +147,7 @@ export default function ExplorerPage() {
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-1.5 text-xs text-slate-500">
-              <img src="/icons/shield-alt-solid.svg" alt="" className="w-3.5 h-3.5 opacity-60" />
-              <span>Attribution équitable selon l&apos;ordre des demandes (FIFO)</span>
-            </div>
+           
           </div>
 
           {/* Grille */}

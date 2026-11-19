@@ -21,9 +21,7 @@ export default function LocationSection({
           <h2 className="text-lg font-bold text-slate-900">
             Localisation approximative
           </h2>
-          <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[11px] font-bold">
-            Confidentialité préservée
-          </span>
+          
         </div>
         <p className="text-xs text-slate-500 mt-1 pl-9">
           Indiquez seulement votre secteur. Votre adresse exacte ne sera échangée qu&apos;en privé avec le bénéficiaire retenu.

@@ -136,7 +136,7 @@ export default function PhotoUploadSection({
             onClick={() => onAddImage()}
             className="mt-3 px-3 py-1.5 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 text-[11px] font-semibold transition-colors cursor-pointer"
           >
-            Tester l&apos;ajout d&apos;une 3ᵉ photo
+      
           </button>
         </div>
       </div>
