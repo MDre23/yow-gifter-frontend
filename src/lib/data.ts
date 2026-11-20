@@ -172,6 +172,8 @@ export const INITIAL_DONATIONS: Donation[] = [
   }
 ];
 
+
+
 export const CURRENT_USER: UserProfile = {
   id: 'usr-current',
   username: 'Alex K.',
@@ -187,6 +189,8 @@ export const CURRENT_USER: UserProfile = {
   donationsCount: 4,
   receivedCount: 2,
 };
+
+
 
 export const INITIAL_CONVERSATION: Conversation = {
   id: 'conv-101',
@@ -235,3 +239,51 @@ export const INITIAL_CONVERSATION: Conversation = {
     },
   ],
 };
+
+export const CURRENT_USER_ID = "usr-current";
+
+export const INITIAL_CONVERSATIONS: Conversation[] = [
+  INITIAL_CONVERSATION,
+  {
+    id: 'conv-102',
+    donationId: '2',
+    donationTitle: 'Lot de 3 casseroles en bon état',
+    donationImage: INITIAL_CONVERSATION.donationImage,
+    donorId: 'usr-current',
+    donorName: 'Alex K.',
+    beneficiaryId: 'usr-2',
+    beneficiaryName: 'Marie_T',
+    status: 'ACTIVE',
+    appointment: {
+      date: 'Jeudi 12 Novembre 2026',
+      time: '16h00',
+      location: 'Entrée du marché de Mokolo',
+      confirmed: true,
+    },
+    messages: [
+      { id: 'm102-1', senderId: 'usr-2', senderName: 'Marie_T', text: 'Bonsoir, vos casseroles sont encore disponibles ?', timestamp: '09:02' },
+      { id: 'm102-2', senderId: 'usr-current', senderName: 'Alex K.', text: 'Bonsoir Marie, oui elles le sont !', timestamp: '09:10' },
+      { id: 'm102-3', senderId: 'usr-2', senderName: 'Marie_T', text: 'Super, jeudi 16h au marché de Mokolo, ça va ?', timestamp: '09:14' },
+    ],
+  },
+  {
+    id: 'conv-103',
+    donationId: '3',
+    donationTitle: 'Vase décoratif en céramique',
+    donationImage: INITIAL_CONVERSATION.donationImage,
+    donorId: 'usr-3',
+    donorName: 'Paul_N',
+    beneficiaryId: 'usr-current',
+    beneficiaryName: 'Alex K.',
+    status: 'ACTIVE',
+    appointment: {
+      date: 'Samedi 14 Novembre 2026',
+      time: '10h00',
+      location: 'Devant la pharmacie de Biyem-Assi',
+      confirmed: false,
+    },
+    messages: [
+      { id: 'm103-1', senderId: 'usr-current', senderName: 'Alex K.', text: 'Bonjour, le vase est-il toujours à donner ?', timestamp: '08:40' },
+    ],
+  },
+];

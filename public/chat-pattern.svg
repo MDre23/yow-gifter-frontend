@@ -1,0 +1,43 @@
+<!--  ce fichier comprends les design de fond du chat  -->
+
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240">
+  <g fill="none" stroke="#047857" stroke-opacity="0.13" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <!-- livre -->
+    <g transform="translate(18 18) rotate(-10 20 20)">
+      <path d="M2 6 C8 3 14 3 20 6 C26 3 32 3 38 6 V32 C32 29 26 29 20 32 C14 29 8 29 2 32 Z M20 6 V32"/>
+    </g>
+    <!-- coeur -->
+    <g transform="translate(108 36) rotate(12 20 20)">
+      <path d="M20 34 C4 22 6 8 14 8 C18 8 20 11 20 13 C20 11 22 8 26 8 C34 8 36 22 20 34 Z"/>
+    </g>
+    <!-- cadeau -->
+    <g transform="translate(182 14)">
+      <rect x="6" y="16" width="28" height="18"/>
+      <rect x="4" y="10" width="32" height="6"/>
+      <path d="M20 10 V34 M20 10 C14 2 8 8 20 10 C32 8 26 2 20 10"/>
+    </g>
+    <!-- sourire -->
+    <g transform="translate(58 98) rotate(8 20 20)">
+      <circle cx="20" cy="20" r="16"/>
+      <path d="M14 16 V18 M26 16 V18 M11 24 Q20 32 29 24"/>
+    </g>
+    <!-- main qui donne (paume ouverte + coeur) -->
+    <g transform="translate(142 100)">
+      <path d="M4 26 H12 C16 26 20 29 24 29 H30 C33 29 33 33 30 33 H22 C18 33 15 31 12 31 H4 Z"/>
+      <path d="M20 20 C12 14 13 7 17 7 C19 7 20 9 20 10 C20 9 21 7 23 7 C27 7 28 14 20 20 Z"/>
+    </g>
+    <!-- vase -->
+    <g transform="translate(16 164) rotate(-8 20 20)">
+      <path d="M14 4 H26 M16 4 C16 12 8 14 8 24 C8 32 14 36 20 36 C26 36 32 32 32 24 C32 14 24 12 24 4"/>
+    </g>
+    <!-- main qui recoit (mains en coupe + etoile) -->
+    <g transform="translate(92 176)">
+      <path d="M4 20 C4 32 12 34 20 34 C28 34 36 32 36 20 H32 C32 26 28 29 20 29 C12 29 8 26 8 20 Z"/>
+      <path d="M20 4 L22 9 L27 9 L23 12 L25 17 L20 14 L15 17 L17 12 L13 9 L18 9 Z"/>
+    </g>
+    <!-- livre (2e) -->
+    <g transform="translate(184 172) rotate(10 20 20)">
+      <path d="M2 6 C8 3 14 3 20 6 C26 3 32 3 38 6 V32 C32 29 26 29 20 32 C14 29 8 29 2 32 Z M20 6 V32"/>
+    </g>
+  </g>
+</svg>
