@@ -16,7 +16,10 @@ export default function DonationBanner({ image, title, href }: DonationBannerPro
         </span>
         <h3 className="text-xs font-bold text-slate-900 truncate">{title}</h3>
       </div>
-      <Link href={href} className="shrink-0 text-[11px] text-emerald-700 font-semibold hover:underline">
+      <Link
+        href={href}
+        className="shrink-0 text-[11px] text-emerald-700 font-semibold hover:underline"
+      >
         Voir l&apos;annonce
       </Link>
     </div>

@@ -13,7 +13,7 @@ export default function CloseTransactionModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100 animate-in fade-in zoom-in-95">
+      <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100">
         <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-xl mx-auto mb-3 font-bold">
           ✓
         </div>
@@ -21,7 +21,9 @@ export default function CloseTransactionModal({
           Confirmer la remise effective de l&apos;objet
         </h3>
         <p className="text-xs text-slate-600 text-center mt-2 leading-relaxed">
-          En confirmant, vous certifiez que l&apos;objet a été remis en main propre. L&apos;annonce sera définitivement marquée comme <strong>« Donné »</strong> et retirée des résultats de recherche.
+          En confirmant, vous certifiez que l&apos;objet a été remis en main propre.
+          L&apos;annonce sera définitivement marquée comme <strong>« Donné »</strong> et
+          retirée des résultats de recherche.
         </p>
         <div className="mt-6 flex items-center justify-center gap-3">
           <button

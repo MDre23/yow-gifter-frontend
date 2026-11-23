@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import SearchInput from "@/components/ui/SearchInput";
 import { matchesSearch } from "@/lib/chat";
 import type { Conversation } from "@/types";
@@ -19,19 +20,39 @@ export default function ConversationList({
   currentUserId,
   selectedId,
   onSelect,
-  title = "Mes conversations",
+  title = "Messagerie",
 }: ConversationListProps) {
   const [query, setQuery] = useState("");
   const visible = conversations.filter((c) => matchesSearch(c, query));
 
   return (
     <div className="flex flex-col flex-1 min-h-0 bg-white">
-      <div className="px-4 pt-4 pb-3 border-b border-slate-100 space-y-3 shrink-0">
-        <h2 className="text-base font-extrabold text-slate-900">{title}</h2>
+      <div className="px-3 pt-3 pb-3 border-b border-slate-100 space-y-3 shrink-0 bg-emerald-700 text-white">
+        <div className="flex items-center gap-2">
+          {/* Mobile uniquement : retour vers Explorer */}
+          <Link
+            href="/explorer"
+            aria-label="Retour à Explorer les dons"
+            className="lg:hidden w-9 h-9 rounded-full flex items-center justify-center hover:bg-emerald-600 active:bg-emerald-800 transition-colors"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+          </Link>
+          <h2 className="text-base font-bold flex-1 tracking-tight">{title}</h2>
+        </div>
         <SearchInput
           value={query}
           onChange={setQuery}
-          placeholder="Rechercher un donateur, un bénéficiaire, un objet"
+          placeholder="Rechercher une conversation"
         />
       </div>
 

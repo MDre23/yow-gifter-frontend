@@ -15,7 +15,7 @@ type Appointment = NonNullable<Conversation["appointment"]>;
 interface ConversationViewProps {
   conversation: Conversation;
   currentUserId: string;
-  onBack: () => void; // retour à la liste (mobile)
+  onBack: () => void;
   onAddMessage: (msg: ChatMessage) => void;
   onSaveAppointment: (appointment: Appointment, systemMessage: ChatMessage) => void;
   onMarkAsGiven: () => void;
@@ -34,7 +34,6 @@ export default function ConversationView({
   const [newMessage, setNewMessage] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-  // Édition du rendez-vous
   const [isEditing, setIsEditing] = useState(false);
   const [editDate, setEditDate] = useState(conversation.appointment?.date ?? "");
   const [editTime, setEditTime] = useState(conversation.appointment?.time ?? "");
@@ -56,7 +55,12 @@ export default function ConversationView({
   const handleSaveAppointment = (e: React.FormEvent) => {
     e.preventDefault();
     onSaveAppointment(
-      { date: editDate, time: editTime, location: editLocation, confirmed: true },
+      {
+        date: editDate,
+        time: editTime,
+        location: editLocation,
+        confirmed: true,
+      },
       {
         id: `msg-${Date.now()}`,
         senderId: "system",
@@ -73,7 +77,7 @@ export default function ConversationView({
     <>
       <ChatWindow
         header={
-          <ChatHeader name={otherName} subtitle={`En ligne • ${otherRole}`} onBack={onBack}>
+          <ChatHeader name={otherName} subtitle={`${otherRole} • En ligne`} onBack={onBack}>
             <button
               type="button"
               onClick={() => setShowConfirmModal(true)}

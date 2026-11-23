@@ -4,8 +4,8 @@ import Avatar from "@/components/ui/Avatar";
 interface ChatHeaderProps {
   name: string;
   subtitle?: string;
-  onBack?: () => void; // flèche de retour vers la liste, visible seulement sur mobile
-  children?: ReactNode; // actions à droite
+  onBack?: () => void;
+  children?: ReactNode;
 }
 
 export default function ChatHeader({ name, subtitle, onBack, children }: ChatHeaderProps) {

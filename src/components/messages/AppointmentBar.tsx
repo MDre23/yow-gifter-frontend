@@ -49,11 +49,8 @@ export default function AppointmentBar({
       </div>
 
       {isEditing ? (
-        <form
-          onSubmit={onSaveAppointment}
-          className="mt-2 max-h-56 overflow-y-auto space-y-3"
-        >
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <form onSubmit={onSaveAppointment} className="mt-2 max-h-40 overflow-y-auto space-y-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
             <TextField
               label="Date"
               value={editDate}
@@ -87,16 +84,16 @@ export default function AppointmentBar({
         <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-700">
           <span className="flex items-center gap-1.5">
             <Icon name="calendar-alt-solid" className="w-3.5 h-3.5 opacity-60" />
-            <span className="font-medium">{appointment?.date}</span>
+            <span className="font-medium">{appointment?.date || "—"}</span>
           </span>
           <span className="flex items-center gap-1.5">
             <Icon name="clock-solid" className="w-3.5 h-3.5 opacity-60" />
-            <span className="font-medium">{appointment?.time}</span>
+            <span className="font-medium">{appointment?.time || "—"}</span>
           </span>
           <span className="flex items-center gap-1.5 min-w-0">
             <Icon name="map-marker-alt-solid" className="w-3.5 h-3.5 opacity-60" />
             <span className="font-semibold text-emerald-800 truncate">
-              {appointment?.location}
+              {appointment?.location || "Lieu à définir"}
             </span>
           </span>
         </div>

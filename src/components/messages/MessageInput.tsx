@@ -16,7 +16,10 @@ export default function MessageInput({
   onSubmit,
 }: MessageInputProps) {
   return (
-    <form onSubmit={onSubmit} className="px-3 py-2.5 bg-slate-50 border-t border-slate-100 flex items-center gap-2">
+    <form
+      onSubmit={onSubmit}
+      className="px-3 py-2.5 bg-slate-50 border-t border-slate-100 flex items-center gap-2 shrink-0"
+    >
       <input
         type="text"
         value={value}
