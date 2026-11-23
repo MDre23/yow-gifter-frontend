@@ -2,14 +2,14 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #111b21;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans), "Plus Jakarta Sans", "Inter", system-ui, -apple-system, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+  --font-sans: var(--font-geist-sans), "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -20,8 +20,8 @@
 }
 
 html {
-  /* Légère augmentation globale (~17px au lieu de 16px) pour rendre tous les textes plus confortables */
-  font-size: 108.25%;
+  /* Taille légèrement augmentée (~17px) pour un confort de lecture proche de WhatsApp Web */
+  font-size: 106.25%;
 }
 
 body {
@@ -29,7 +29,7 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   font-size: 1rem;
-  line-height: 1.55;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
