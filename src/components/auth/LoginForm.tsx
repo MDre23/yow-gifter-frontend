@@ -128,7 +128,7 @@ export default function LoginForm() {
         disabled={loading}
         className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 disabled:opacity-70"
       >
-        <span>{loading ? "Connexion en cours..." : "Se connecter & Accéder à l'application"}</span>
+        <span>{loading ? "Connexion en cours..." : "Se connecter"}</span>
         <img
           src="/icons/arrow-right-solid.svg"
           alt=""

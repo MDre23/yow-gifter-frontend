@@ -27,7 +27,7 @@ export default function ConversationList({
 
   return (
     <div className="flex flex-col flex-1 min-h-0 bg-white">
-      <div className="px-3 pt-3 pb-3 border-b border-slate-100 space-y-3 shrink-0 bg-emerald-700 text-white">
+      <div className="px-3 pt-3 pb-3 border-b border-slate-400 space-y-3 shrink-0 bg-white text-black">
         <div className="flex items-center gap-2">
           {/* Mobile uniquement : retour vers Explorer */}
           <Link
