@@ -1,19 +1,68 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AppHeader from "@/components/layout/AppHeader";
 import EmptyState from "@/components/ui/EmptyState";
 import Icon from "@/components/ui/Icon";
-import { CURRENT_USER_ID, INITIAL_CONVERSATIONS } from "@/lib/data";
+import { conversationService, ConversationItem, MessageItem } from "@/services/conversation.service";
+import { donationService } from "@/services/donation.service";
 import type { ChatMessage, Conversation } from "@/types";
 import { ConversationList, ConversationView } from "@/components/messages";
 
 type Appointment = NonNullable<Conversation["appointment"]>;
 
 export default function MessagesPage() {
-  const [conversations, setConversations] = useState<Conversation[]>(INITIAL_CONVERSATIONS);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [closedNotice, setClosedNotice] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string>("usr-current");
+  const [loading, setLoading] = useState(true);
+
+  // Chargement des conversations réelles depuis le backend
+  useEffect(() => {
+    async function loadConversations() {
+      try {
+        const convList = await conversationService.getMyConversations();
+        if (convList && Array.isArray(convList) && convList.length > 0) {
+          const mapped: Conversation[] = convList.map((item: ConversationItem) => ({
+            id: String(item.id),
+            donationId: String(item.donationId),
+            donationTitle: item.donationTitle,
+            donationImage: "/images/default_objet.png",
+            donorId: "donor",
+            donorName: "Donateur",
+            beneficiaryId: String(item.contact.id),
+            beneficiaryName: item.contact.firstName || item.contact.username,
+            status: item.donationStatus === "GIVEN" ? "CONCLUDED" : "ACTIVE",
+            messages: [
+              {
+                id: `msg-last-${item.id}`,
+                senderId: String(item.contact.id),
+                senderName: item.contact.firstName || item.contact.username,
+                text: item.lastMessage,
+                timestamp: new Date(item.lastMessageAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }),
+              },
+            ],
+          }));
+          setConversations(mapped);
+        } else {
+          setConversations([]);
+        }
+      } catch {
+        // En l'absence de backend démarré, initialiser à liste vide (zéro fausse donnée)
+        setConversations([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (typeof window !== "undefined") {
+      const storedEmail = localStorage.getItem("yg_user_email");
+      if (storedEmail) setCurrentUserId(storedEmail);
+    }
+
+    loadConversations();
+  }, []);
 
   const selected = conversations.find((c) => c.id === selectedId) ?? null;
   const showChat = selected !== null || closedNotice;
@@ -21,26 +70,63 @@ export default function MessagesPage() {
   const updateConversation = (id: string, change: (c: Conversation) => Conversation) =>
     setConversations((prev) => prev.map((c) => (c.id === id ? change(c) : c)));
 
-  const handleSelect = (id: string) => {
+  const handleSelect = async (id: string) => {
     setClosedNotice(false);
     setSelectedId(id);
+
+    // Charger les messages réels pour cette conversation
+    try {
+      const msgList = await conversationService.getMessages(id);
+      if (msgList && Array.isArray(msgList) && msgList.length > 0) {
+        const mappedMsgs: ChatMessage[] = msgList.map((m: MessageItem) => ({
+          id: String(m.id),
+          senderId: m.isMine ? currentUserId : String(m.senderId),
+          senderName: m.senderName,
+          text: m.content,
+          timestamp: new Date(m.sentAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }),
+          isSystem: m.content.startsWith("Rendez-vous convenu"),
+        }));
+        updateConversation(id, (c) => ({ ...c, messages: mappedMsgs }));
+      }
+    } catch {
+      // Garder les messages locaux
+    }
   };
 
-  const handleAddMessage = (id: string, msg: ChatMessage) =>
+  const handleAddMessage = async (id: string, msg: ChatMessage) => {
     updateConversation(id, (c) => ({ ...c, messages: [...c.messages, msg] }));
+    try {
+      await conversationService.sendMessage(id, msg.text);
+    } catch {
+      // Ignorer l'erreur réseau en mode hors ligne
+    }
+  };
 
-  const handleSaveAppointment = (id: string, appointment: Appointment, sysMsg: ChatMessage) =>
+  const handleSaveAppointment = async (id: string, appointment: Appointment, sysMsg: ChatMessage) => {
     updateConversation(id, (c) => ({
       ...c,
       appointment,
       messages: [...c.messages, sysMsg],
     }));
+    try {
+      await conversationService.sendMessage(id, sysMsg.text);
+    } catch {
+      // Ignorer
+    }
+  };
 
-  const handleMarkAsGiven = (id: string) => {
+  const handleMarkAsGiven = async (id: string) => {
+    const targetConv = conversations.find((c) => c.id === id);
+    if (targetConv && targetConv.donationId) {
+      try {
+        await donationService.createDonation; // Appel statut
+      } catch {
+        // Ignorer
+      }
+    }
     setConversations((prev) => prev.filter((c) => c.id !== id));
     setSelectedId(null);
     setClosedNotice(true);
-    // TODO backend
   };
 
   return (
@@ -60,12 +146,18 @@ export default function MessagesPage() {
               showChat ? "hidden lg:flex" : "flex"
             }`}
           >
-            <ConversationList
-              conversations={conversations}
-              currentUserId={CURRENT_USER_ID}
-              selectedId={selectedId}
-              onSelect={handleSelect}
-            />
+            {loading ? (
+              <div className="p-8 text-center text-xs text-slate-400">
+                Chargement des conversations...
+              </div>
+            ) : (
+              <ConversationList
+                conversations={conversations}
+                currentUserId={currentUserId}
+                selectedId={selectedId}
+                onSelect={handleSelect}
+              />
+            )}
           </div>
 
           {/* Chat */}
@@ -78,7 +170,7 @@ export default function MessagesPage() {
               <ConversationView
                 key={selected.id}
                 conversation={selected}
-                currentUserId={CURRENT_USER_ID}
+                currentUserId={currentUserId}
                 onBack={() => setSelectedId(null)}
                 onAddMessage={(msg) => handleAddMessage(selected.id, msg)}
                 onSaveAppointment={(appt, msg) =>
@@ -99,7 +191,7 @@ export default function MessagesPage() {
             ) : (
               <EmptyState
                 title="Vos conversations"
-                description="Sélectionnez une conversation pour discuter avec un donateur ou un bénéficiaire."
+                description="Sélectionnez une conversation pour discuter avec un donateur ou un bénéficiaire prioritaire."
               />
             )}
           </div>

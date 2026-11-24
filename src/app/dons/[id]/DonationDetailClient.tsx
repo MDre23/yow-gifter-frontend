@@ -5,7 +5,9 @@ import Link from "next/link";
 import AppHeader from "@/components/layout/AppHeader";
 import Footer from "@/components/layout/Footer";
 import { INITIAL_DONATIONS } from "@/lib/data";
-import { Donation } from "@/types";
+import { donationService } from "@/services/donation.service";
+import { requestService } from "@/services/request.service";
+import { Donation, CategoryType, ConditionType, DonationStatus } from "@/types";
 import {
   DonationGallery,
   DonationSpecs,
@@ -23,23 +25,78 @@ export default function DonationDetailClient({ id }: { id: string }) {
   >("NONE");
   const [queuePosition, setQueuePosition] = useState<number>(0);
   const [totalQueue, setTotalQueue] = useState<number>(0);
-  const [timeLeft, setTimeLeft] = useState<number>(3600); // TTL 1 heure en secondes
+  const [timeLeft, setTimeLeft] = useState<number>(3600); // TTL en secondes
+  const [currentRequestId, setCurrentRequestId] = useState<number | null>(null);
 
   useEffect(() => {
-    const item =
-      INITIAL_DONATIONS.find((d) => d.id === id) ||
-      INITIAL_DONATIONS[0];
-    setDonation(item);
-    setTotalQueue(item.queueCount || 0);
+    let isMounted = true;
 
-    // Démonstration interactive selon l'objet
-    if (item.id === "1") {
-      setUserQueueStatus("PRIORITY");
-      setQueuePosition(1);
-    } else if (item.id === "2") {
-      setUserQueueStatus("WAITING");
-      setQueuePosition(3);
+    async function loadDonation() {
+      try {
+        const live = await donationService.getDonationById(id);
+        if (live && isMounted) {
+          const mapped: Donation = {
+            id: String(live.id),
+            title: live.title,
+            description: live.description,
+            category: live.categoryName as CategoryType,
+            condition: live.condition as ConditionType,
+            status: live.status as DonationStatus,
+            city: live.city,
+            neighborhood: live.neighborhood,
+            quantity: live.quantity,
+            images:
+              live.imageUrls && live.imageUrls.length > 0
+                ? live.imageUrls
+                : ["/images/default_objet.png"],
+            createdAt: live.createdAt,
+            donor: {
+              id: String(live.donor.id),
+              username: live.donor.firstName || live.donor.username,
+              city: live.donor.city,
+              neighborhood: live.donor.neighborhood,
+              campusBadge: live.donor.isVerified ? "Membre vérifié" : undefined,
+            },
+            queueCount: live.waitingRequestsCount,
+          };
+          setDonation(mapped);
+          setTotalQueue(live.waitingRequestsCount || 0);
+
+          try {
+            const myRequests = await requestService.getMyRequests();
+            const myReq = myRequests.find((r) => String(r.donationId) === String(id));
+            if (myReq && isMounted) {
+              setCurrentRequestId(myReq.id);
+              if (myReq.status === "PRIORITY") {
+                setUserQueueStatus("PRIORITY");
+                setQueuePosition(1);
+              } else if (myReq.status === "WAITING") {
+                setUserQueueStatus("WAITING");
+                setQueuePosition(myReq.positionInQueue || 1);
+              }
+            }
+          } catch {
+            // Non authentifié ou hors ligne
+          }
+          return;
+        }
+      } catch {
+        // Fallback transparent
+      }
+
+      if (isMounted) {
+        const item =
+          INITIAL_DONATIONS.find((d) => d.id === id) ||
+          INITIAL_DONATIONS[0];
+        setDonation(item);
+        setTotalQueue(item.queueCount || 0);
+      }
     }
+
+    loadDonation();
+    return () => {
+      isMounted = false;
+    };
   }, [id]);
 
   // Simulation du décompte TTL
@@ -60,30 +117,55 @@ export default function DonationDetailClient({ id }: { id: string }) {
   };
 
   // Action : Rejoindre la file FIFO
-  const handleJoinQueue = () => {
+  const handleJoinQueue = async () => {
     if (!donation) return;
-    if (totalQueue === 0 && donation.status === "AVAILABLE") {
-      setUserQueueStatus("PRIORITY");
-      setQueuePosition(1);
-      setTotalQueue(1);
-      setTimeLeft(3600);
-    } else {
-      const newPos = totalQueue + 1;
-      setUserQueueStatus("WAITING");
-      setQueuePosition(newPos);
-      setTotalQueue(newPos);
+
+    try {
+      const req = await requestService.joinQueue(id);
+      setCurrentRequestId(req.id);
+      if (req.status === "PRIORITY") {
+        setUserQueueStatus("PRIORITY");
+        setQueuePosition(1);
+        setTotalQueue((prev) => prev + 1);
+        setTimeLeft(48 * 3600);
+      } else {
+        setUserQueueStatus("WAITING");
+        setQueuePosition(req.positionInQueue || totalQueue + 1);
+        setTotalQueue((prev) => prev + 1);
+      }
+    } catch {
+      // Mode hors-ligne / fallback
+      if (totalQueue === 0 && donation.status === "AVAILABLE") {
+        setUserQueueStatus("PRIORITY");
+        setQueuePosition(1);
+        setTotalQueue(1);
+        setTimeLeft(3600);
+      } else {
+        const newPos = totalQueue + 1;
+        setUserQueueStatus("WAITING");
+        setQueuePosition(newPos);
+        setTotalQueue(newPos);
+      }
     }
   };
 
   // Action : Désistement volontaire
-  const handleCancelRequest = () => {
+  const handleCancelRequest = async () => {
     if (
       confirm(
         "Êtes-vous sûr de vouloir vous désister ? Le demandeur suivant dans la file d'attente deviendra prioritaire."
       )
     ) {
+      if (currentRequestId) {
+        try {
+          await requestService.cancelRequest(currentRequestId);
+        } catch {
+          // Erreur réseau ignorée
+        }
+      }
       setUserQueueStatus("NONE");
       setQueuePosition(0);
+      setCurrentRequestId(null);
       setTotalQueue((prev) => Math.max(0, prev - 1));
     }
   };

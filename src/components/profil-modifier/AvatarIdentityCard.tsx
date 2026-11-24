@@ -1,11 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { authService } from "@/services/auth.service";
 
 export default function AvatarIdentityCard() {
+  const [userName, setUserName] = useState("Mon Profil Citoyen");
   const [avatar, setAvatar] = useState(
     "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80"
   );
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedName = localStorage.getItem("yg_username");
+      if (storedName) setUserName(storedName);
+      authService.getMe().then((me) => {
+        if (me) {
+          setUserName(`${me.firstName} ${me.lastName || ""}`.trim());
+          if (me.avatarUrl) setAvatar(me.avatarUrl);
+        }
+      }).catch(() => {});
+    }
+  }, []);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -23,7 +38,7 @@ export default function AvatarIdentityCard() {
         <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full p-1 bg-slate-100 shadow-sm transition-transform duration-300 group-hover:scale-[1.02] overflow-hidden">
           <img
             src={avatar}
-            alt="Avatar Alex Kamga"
+            alt={userName}
             className="w-full h-full object-cover rounded-full"
           />
         </div>
@@ -47,8 +62,8 @@ export default function AvatarIdentityCard() {
         />
       </div>
 
-      <h2 className="text-xl font-bold text-slate-900">Alex Kamga</h2>
-      <p className="text-xs text-slate-500 mt-0.5">Membre donateur depuis Octobre 2024</p>
+      <h2 className="text-xl font-bold text-slate-900">{userName}</h2>
+      <p className="text-xs text-slate-500 mt-0.5">Membre engagé pour l&apos;économie circulaire</p>
       <p className="text-[11px] text-slate-400 mt-1">
         Formats acceptés : JPG, PNG ou WebP (max 5 Mo)
       </p>
@@ -72,7 +87,7 @@ export default function AvatarIdentityCard() {
           </p>
           <div className="flex items-center gap-1.5 text-slate-500 text-[10px] font-medium mt-2">
             <img src="/icons/calendar-alt-solid.svg" alt="" className="w-3 h-3 opacity-50" />
-            <span>Validé le 12 Février 2025</span>
+            <span>Validé pour l&apos;année académique en cours</span>
           </div>
         </div>
       </div>

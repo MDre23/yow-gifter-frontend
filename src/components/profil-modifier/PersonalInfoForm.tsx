@@ -1,23 +1,51 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { authService } from "@/services/auth.service";
 
 export default function PersonalInfoForm() {
   const router = useRouter();
-  const [firstName, setFirstName] = useState("Alex");
-  const [lastName, setLastName] = useState("Kamga");
-  const [age, setAge] = useState(24);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [age, setAge] = useState<number>(22);
   const [location, setLocation] = useState("yaounde-melen");
-  const [bio, setBio] = useState(
-    "Étudiant à l'université, passionné d'informatique et engagé dans l'éco-responsabilité et le don d'objets du quotidien."
-  );
+  const [bio, setBio] = useState("");
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedName = localStorage.getItem("yg_username") || "Citoyen";
+      const parts = storedName.split(" ");
+      setFirstName(parts[0] || "Citoyen");
+      setLastName(parts.slice(1).join(" ") || "");
+
+      authService.getMe().then((me) => {
+        if (me) {
+          if (me.firstName) setFirstName(me.firstName);
+          if (me.lastName) setLastName(me.lastName);
+          if (me.age) setAge(me.age);
+          if (me.bio) setBio(me.bio);
+          if (me.neighborhood) {
+            if (me.neighborhood.toLowerCase().includes("bastos")) setLocation("yaounde-bastos");
+            else if (me.neighborhood.toLowerCase().includes("polytech") || me.neighborhood.toLowerCase().includes("ngoa")) setLocation("yaounde-polytech");
+            else if (me.neighborhood.toLowerCase().includes("biyem")) setLocation("yaounde-biyemassi");
+            else setLocation("yaounde-melen");
+          }
+        }
+      }).catch(() => {});
+    }
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem("yg_username", `${firstName} ${lastName ? lastName[0] + "." : ""}`.trim());
+    }
+
     setTimeout(() => {
       setLoading(false);
       setSaved(true);
@@ -66,6 +94,7 @@ export default function PersonalInfoForm() {
                 required
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
+                placeholder="Votre prénom"
                 className="w-full h-11 pl-10 pr-4 rounded-xl bg-slate-50 text-slate-900 text-xs font-medium border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#004e3e]/30"
               />
             </div>
@@ -87,6 +116,7 @@ export default function PersonalInfoForm() {
                 required
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
+                placeholder="Votre nom de famille"
                 className="w-full h-11 pl-10 pr-4 rounded-xl bg-slate-50 text-slate-900 text-xs font-medium border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#004e3e]/30"
               />
             </div>

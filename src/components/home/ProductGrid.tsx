@@ -1,5 +1,9 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import ProductCard from '@/components/ui/ProductCard';
 import { Product } from '@/types';
+import { donationService } from "@/services/donation.service";
 
 // Données de secours si l'API Spring Boot n'est pas encore connectée
 const FALLBACK_PRODUCTS: Product[] = [
@@ -42,7 +46,35 @@ const FALLBACK_PRODUCTS: Product[] = [
 ];
 
 export default function ProductGrid({ initialProducts }: { initialProducts?: Product[] }) {
-  const products = initialProducts && initialProducts.length > 0 ? initialProducts : FALLBACK_PRODUCTS;
+  const [products, setProducts] = useState<Product[]>(
+    initialProducts && initialProducts.length > 0 ? initialProducts : FALLBACK_PRODUCTS
+  );
+
+  useEffect(() => {
+    async function loadRecent() {
+      try {
+        const res = await donationService.getDonations({ size: 4 });
+        if (res && res.content && res.content.length > 0) {
+          const mapped: Product[] = res.content.map((d) => ({
+            id: String(d.id),
+            title: d.title,
+            description: d.description,
+            category: d.categoryName,
+            location: `${d.city} - ${d.neighborhood}`,
+            image:
+              d.imageUrls && d.imageUrls.length > 0
+                ? d.imageUrls[0]
+                : "/images/default_objet.png",
+            status: d.status,
+          }));
+          setProducts(mapped);
+        }
+      } catch {
+        // Fallback transparent
+      }
+    }
+    loadRecent();
+  }, []);
 
   return (
     <section className="py-16 bg-slate-50/70 border-y border-slate-100" id="dons-disponibles">

@@ -3,20 +3,52 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import { authService } from "@/services/auth.service";
+import { conversationService } from "@/services/conversation.service";
 
 export default function AppHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [currentUser, setCurrentUser] = useState<{ name: string; location: string }>({
+    name: "Alex K.",
+    location: "Melen • UY1",
+  });
+  const [unreadCount, setUnreadCount] = useState<number>(0);
   const pathname = usePathname();
   const router = useRouter();
 
-  // Contrôle strict d'accès : Impossible d'atterrir dans l'app sans passer par /auth
+  // Contrôle strict d'accès & Chargement dynamique du profil
   useEffect(() => {
     if (typeof window !== "undefined") {
       const isAuth = localStorage.getItem("yg_authenticated");
       if (!isAuth) {
         router.replace("/auth");
+        return;
       }
+      const storedName = localStorage.getItem("yg_username");
+      if (storedName) {
+        setCurrentUser({
+          name: storedName,
+          location: "Melen • Yaoundé",
+        });
+      }
+
+      // Chargement dynamique depuis l'API backend si disponible
+      authService.getMe().then((me) => {
+        if (me) {
+          setCurrentUser({
+            name: `${me.firstName} ${me.lastName ? me.lastName[0] + "." : ""}`,
+            location: me.neighborhood || me.city || "Yaoundé",
+          });
+        }
+      }).catch(() => {});
+
+      // Nombre dynamique de conversations
+      conversationService.getMyConversations().then((convs) => {
+        if (convs && Array.isArray(convs)) {
+          setUnreadCount(convs.length);
+        }
+      }).catch(() => {});
     }
   }, [router]);
 
@@ -103,9 +135,11 @@ export default function AppHeader() {
               }`}
             >
               <span>Messages</span>
-              <span className="px-2 py-0.5 rounded-full bg-[#006a6a] text-white text-xs font-bold leading-none">
-                3
-              </span>
+              {unreadCount > 0 && (
+                <span className="px-2 py-0.5 rounded-full bg-[#006a6a] text-white text-xs font-bold leading-none">
+                  {unreadCount}
+                </span>
+              )}
             </Link>
           </nav>
 
@@ -125,28 +159,21 @@ export default function AppHeader() {
             <span className="hidden sm:inline">Donner un objet</span>
           </Link>
 
-          {/* Chip Profil Utilisateur */}
+          {/* Chip Profil Utilisateur Dynamique */}
           <Link
             href="/profil/modifier"
             className="flex items-center gap-2.5 pl-2 hover:opacity-85 transition-opacity"
             title="Mon profil & Paramètres"
           >
-            <div className="w-9 h-9 rounded-full bg-[#004e3e] flex items-center justify-center text-white shrink-0 shadow-xs">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-5 h-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-              </svg>
+            <div className="w-9 h-9 rounded-full bg-[#004e3e] flex items-center justify-center text-white shrink-0 shadow-xs font-bold text-xs">
+              {currentUser.name ? currentUser.name.slice(0, 2).toUpperCase() : "YG"}
             </div>
             <div className="hidden lg:flex flex-col text-left">
               <span className="text-xs font-bold text-slate-900 leading-tight">
-                Alex K.
+                {currentUser.name}
               </span>
               <span className="text-[11px] text-slate-500 leading-tight">
-                Melen • UY1
+                {currentUser.location}
               </span>
             </div>
           </Link>
@@ -205,9 +232,11 @@ export default function AppHeader() {
             className="flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50"
           >
             <span>Messages</span>
-            <span className="px-2 py-0.5 rounded-full bg-[#006a6a] text-white text-xs font-bold">
-              3
-            </span>
+            {unreadCount > 0 && (
+              <span className="px-2 py-0.5 rounded-full bg-[#006a6a] text-white text-xs font-bold">
+                {unreadCount}
+              </span>
+            )}
           </Link>
           <Link
             href="/donner"
@@ -221,7 +250,7 @@ export default function AppHeader() {
             onClick={() => setIsOpen(false)}
             className="block text-center text-slate-600 text-xs py-2 hover:underline"
           >
-            Mon profil &amp; Paramètres (Alex K. • Melen UY1)
+            Mon profil & Paramètres ({currentUser.name} • {currentUser.location})
           </Link>
         </div>
       )}

@@ -1,58 +1,93 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AppHeader from "@/components/layout/AppHeader";
 import Footer from "@/components/layout/Footer";
-import { CURRENT_USER, INITIAL_DONATIONS } from "@/lib/data";
+import { authService, UserProfile } from "@/services/auth.service";
+import { donationService } from "@/services/donation.service";
+import { requestService, RequestItem as ApiRequestItem } from "@/services/request.service";
+import { Donation } from "@/types";
 import {
   ProfileCard,
   ProfileTabs,
   UserDonationsList,
   UserRequestsList,
 } from "@/components/profil";
+import { RequestItem } from "@/components/profil/UserRequestsList";
 
 export default function ProfilPage() {
   const [activeTab, setActiveTab] = useState<"donations" | "requests">("donations");
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [myDonations, setMyDonations] = useState<Donation[]>([]);
+  const [myRequests, setMyRequests] = useState<RequestItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Dons publiés par l'utilisateur
-  const myDonations = INITIAL_DONATIONS.slice(0, 3);
+  useEffect(() => {
+    async function loadProfileData() {
+      try {
+        const me = await authService.getMe();
+        if (me) {
+          setProfile(me);
+        }
+      } catch {
+        // Fallback local avec identifiants enregistrés
+        if (typeof window !== "undefined") {
+          const storedName = localStorage.getItem("yg_username") || "Mon Compte";
+          const storedEmail = localStorage.getItem("yg_user_email") || "";
+          setProfile({
+            id: 1,
+            email: storedEmail,
+            username: storedName,
+            firstName: storedName.split(" ")[0] || "Citoyen",
+            lastName: "",
+            city: "Yaoundé",
+            neighborhood: "Melen / Campus UY1",
+            isVerified: true,
+            createdAt: new Date().toISOString(),
+          });
+        }
+      }
 
-  // Demandes d'objets formulées par l'utilisateur
-  const myRequests = [
-    {
-      id: "req-1",
-      donationId: "1",
-      title: "Manuel complet d'Algorithmique et Structures de Données",
-      image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80",
-      donorName: "Alex_Polytech",
-      status: "PRIORITY",
-      position: 1,
-      requestedAt: "Aujourd'hui à 09:45",
-      expiresAt: "Dans 42 minutes",
-    },
-    {
-      id: "req-2",
-      donationId: "2",
-      title: "Ordinateur portable Dell Latitude E7470",
-      image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=800&q=80",
-      donorName: "Marc_Dev",
-      status: "WAITING",
-      position: 3,
-      requestedAt: "Hier à 14:20",
-      expiresAt: undefined,
-    },
-    {
-      id: "req-3",
-      donationId: "6",
-      title: "Calculatrice scientifique Casio fx-991ES PLUS",
-      image: "https://images.unsplash.com/photo-1594980596870-8aa52a78d8cd?auto=format&fit=crop&w=800&q=80",
-      donorName: "Thierry_T",
-      status: "COMPLETED",
-      position: 1,
-      requestedAt: "Il y a 5 jours",
-      expiresAt: undefined,
-    },
-  ];
+      // Chargement des demandes réelles
+      try {
+        const reqs = await requestService.getMyRequests();
+        if (reqs && reqs.length > 0) {
+          const mapped: RequestItem[] = reqs.map((r: ApiRequestItem) => ({
+            id: String(r.id),
+            donationId: String(r.donationId),
+            title: r.donationTitle,
+            image: "/images/default_objet.png",
+            donorName: "Donateur",
+            status: r.status,
+            position: r.positionInQueue,
+            requestedAt: new Date(r.requestedAt).toLocaleDateString("fr-FR"),
+            expiresAt: r.expiresAt ? new Date(r.expiresAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }) : undefined,
+          }));
+          setMyRequests(mapped);
+        }
+      } catch {
+        // Pas de requêtes actives
+      }
+
+      // Chargement des dons réels
+      try {
+        const dons = await donationService.getDonations();
+        if (dons && dons.content && dons.content.length > 0) {
+          setMyDonations([]);
+        }
+      } catch {
+        // Pas de dons créés
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadProfileData();
+  }, []);
+
+  const displayName = profile
+    ? `${profile.firstName} ${profile.lastName ? profile.lastName : ""}`.trim()
+    : "Mon Profil Citoyen";
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -61,11 +96,11 @@ export default function ProfilPage() {
       <main className="flex-1 pt-24 pb-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-8">
           <ProfileCard
-            username={CURRENT_USER.username}
-            city={CURRENT_USER.city}
-            neighborhood={CURRENT_USER.neighborhood}
-            donationsCount={CURRENT_USER.donationsCount}
-            receivedCount={CURRENT_USER.receivedCount}
+            username={displayName || "Alex Kamga"}
+            city={profile?.city || "Yaoundé"}
+            neighborhood={profile?.neighborhood || "Melen"}
+            donationsCount={myDonations.length}
+            receivedCount={myRequests.filter((r) => r.status === "COMPLETED").length}
           />
 
           <ProfileTabs
@@ -75,10 +110,26 @@ export default function ProfilPage() {
             onSelectTab={setActiveTab}
           />
 
-          {activeTab === "donations" ? (
-            <UserDonationsList donations={myDonations} />
-          ) : (
+          {loading ? (
+            <div className="p-8 text-center text-slate-400 text-sm">
+              Chargement de votre activité solidaire...
+            </div>
+          ) : activeTab === "donations" ? (
+            myDonations.length > 0 ? (
+              <UserDonationsList donations={myDonations} />
+            ) : (
+              <div className="p-12 text-center bg-white rounded-2xl border border-slate-200/80 mt-4">
+                <p className="text-sm font-semibold text-slate-700">Vous n&apos;avez pas encore publié de don.</p>
+                <p className="text-xs text-slate-400 mt-1">Donnez une seconde vie à vos objets inutilisés en 0 FCFA.</p>
+              </div>
+            )
+          ) : myRequests.length > 0 ? (
             <UserRequestsList requests={myRequests} />
+          ) : (
+            <div className="p-12 text-center bg-white rounded-2xl border border-slate-200/80 mt-4">
+              <p className="text-sm font-semibold text-slate-700">Vous n&apos;avez aucune demande active pour le moment.</p>
+              <p className="text-xs text-slate-400 mt-1">Explorez les dons disponibles pour réserver des objets utiles à vos études ou projets.</p>
+            </div>
           )}
         </div>
       </main>
