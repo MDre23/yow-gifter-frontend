@@ -35,6 +35,16 @@ export interface PageResponse<T> {
   number: number;
 }
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+
+// 🛠️ Fonction utilitaire pour corriger l'URL des images
+const formatImageUrl = (url: string) => {
+  if (!url) return "/images/default_objet.png";
+  if (url.startsWith("http")) return url;
+  // Si l'image est sur le serveur Spring Boot (ex: /uploads/donations/xxx.jpg)
+  return `${API_BASE_URL.replace('/api/v1', '')}${url}`;
+};
+
 export const donationService = {
   async getDonations(params?: {
     categoryId?: number;
@@ -43,13 +53,28 @@ export const donationService = {
     page?: number;
     size?: number;
   }): Promise<PageResponse<DonationItem>> {
-    return apiRequest<PageResponse<DonationItem>>("/donations", {
+    const response = await apiRequest<PageResponse<DonationItem>>("/donations", {
       params: params as Record<string, string | number>,
     });
+
+    // On corrige les URLs des images avant de renvoyer au composant
+    if (response && response.content) {
+      response.content = response.content.map(d => ({
+        ...d,
+        imageUrls: d.imageUrls && d.imageUrls.length > 0 
+          ? d.imageUrls.map(formatImageUrl) 
+          : ["/images/default_objet.png"]
+      }));
+    }
+    return response;
   },
 
   async getDonationById(id: number | string): Promise<DonationItem> {
-    return apiRequest<DonationItem>(`/donations/${id}`);
+    const donation = await apiRequest<DonationItem>(`/donations/${id}`);
+    if (donation && donation.imageUrls) {
+      donation.imageUrls = donation.imageUrls.map(formatImageUrl);
+    }
+    return donation;
   },
 
   async createDonation(data: {

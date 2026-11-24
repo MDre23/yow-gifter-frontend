@@ -67,6 +67,14 @@ export const authService = {
     return apiRequest<UserProfile>("/auth/me");
   },
 
+  //  NOUVELLE FONCTION ICI
+  async updateProfile(data: Partial<UserProfile>): Promise<UserProfile> {
+    return apiRequest<UserProfile>("/users/me", {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+  },
+
   logout() {
     if (typeof window !== "undefined") {
       localStorage.removeItem("yg_jwt");

@@ -89,6 +89,7 @@ export default function RegisterForm() {
     setError(null);
 
     try {
+      // Appel réel à l'API Spring Boot
       await authService.register({
         email,
         password,
@@ -101,18 +102,9 @@ export default function RegisterForm() {
       });
       router.push("/explorer");
     } catch (err: unknown) {
+      // Affichage de la vraie erreur (ex: "Email déjà utilisé")
       const msg = err instanceof Error ? err.message : "Erreur lors de l'inscription";
-      if (msg.includes("Failed to fetch") || msg.includes("NetworkError")) {
-        console.warn("Backend Spring Boot non détecté sur le port 8080, utilisation de la session locale de démo.");
-        if (typeof window !== "undefined") {
-          localStorage.setItem("yg_authenticated", "true");
-          localStorage.setItem("yg_username", firstName || username || "Alex Kamga");
-          localStorage.setItem("yg_user_email", email);
-        }
-        router.push("/explorer");
-      } else {
-        setError(msg);
-      }
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -173,7 +165,7 @@ export default function RegisterForm() {
               required
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              placeholder="Ex: Kamga"
+              placeholder="Ex: Mvesso"
               className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500"
             />
           </div>

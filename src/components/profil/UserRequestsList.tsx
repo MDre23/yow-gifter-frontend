@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { RequestStatusLabels } from "@/lib/translations"; // 🛠️ Import centralisé
 
 export interface RequestItem {
   id: string;
@@ -16,9 +17,7 @@ interface UserRequestsListProps {
   requests: RequestItem[];
 }
 
-export default function UserRequestsList({
-  requests,
-}: UserRequestsListProps) {
+export default function UserRequestsList({ requests }: UserRequestsListProps) {
   return (
     <div className="space-y-4">
       <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
@@ -39,20 +38,24 @@ export default function UserRequestsList({
               />
               <div>
                 <div className="flex items-center gap-2 mb-1">
+                  
+                  {/* 🛠️ Utilisation des traductions pour les badges de statut */}
                   {req.status === "PRIORITY" && (
                     <span className="inline-flex items-center gap-1 text-[10px] font-extrabold px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping"></span>
-                      Prioritaire (#1)
+                      {RequestStatusLabels[req.status] || req.status}
                     </span>
                   )}
+                  
                   {req.status === "WAITING" && (
                     <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-amber-100 text-amber-900">
-                      En attente (Position #{req.position})
+                      {RequestStatusLabels[req.status] || req.status} (Position #{req.position})
                     </span>
                   )}
+                  
                   {req.status === "COMPLETED" && (
                     <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-slate-900 text-white">
-                      Objet récupéré ✓
+                      {RequestStatusLabels[req.status] || req.status}
                     </span>
                   )}
 

@@ -24,25 +24,20 @@ const categoryToIdMap: Record<CategoryType, number> = {
 };
 
 export default function DonnerPage() {
-  // Photos (Max 2 strictes)
-  const [images, setImages] = useState<string[]>([
-    "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=800&q=80",
-  ]);
+  // Photos (Max 2 strictes) - Initialisé vide
+  const [images, setImages] = useState<string[]>([]);
   const [showQuotaAlert, setShowQuotaAlert] = useState(false);
   const [quotaAttemptMessage, setQuotaAttemptMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Champs du formulaire
-  const [title, setTitle] = useState("Manuel d'Algorithmique et Structures de Données");
+  // Champs du formulaire - Initialisés vides
+  const [title, setTitle] = useState("");
   const [category, setCategory] = useState<CategoryType>("Livres & Manuels");
   const [condition, setCondition] = useState<ConditionType>("TRES_BON");
   const [quantity, setQuantity] = useState(1);
-  const [description, setDescription] = useState(
-    "Manuel complet de cours avec exercices corrigés. Propre et en très bon état."
-  );
+  const [description, setDescription] = useState("");
   const [city] = useState("Yaoundé");
-  const [neighborhood, setNeighborhood] = useState("Melen (Campus UY1)");
+  const [neighborhood, setNeighborhood] = useState("Melen");
   const [submitted, setSubmitted] = useState(false);
 
   const handleAddImageAttempt = (e?: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,6 +52,14 @@ export default function DonnerPage() {
 
     if (e && e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      
+      // 🛠️ VÉRIFICATION DE LA TAILLE CÔTÉ CLIENT (5 Mo max)
+      if (file.size > 5 * 1024 * 1024) {
+        alert("L'image est trop lourde. Veuillez choisir une image de moins de 5 Mo.");
+        e.target.value = ""; // Réinitialiser l'input pour permettre de re-sélectionner
+        return;
+      }
+
       const imageUrl = URL.createObjectURL(file);
       setImages((prev) => [...prev, imageUrl]);
       setShowQuotaAlert(false);
@@ -89,9 +92,7 @@ export default function DonnerPage() {
       });
       setSubmitted(true);
     } catch {
-      // Fallback local si backend déconnecté
-      console.info("Publication locale validée.");
-      setSubmitted(true);
+      alert("Erreur lors de la publication sur le serveur. Vérifiez votre connexion.");
     } finally {
       setLoading(false);
     }

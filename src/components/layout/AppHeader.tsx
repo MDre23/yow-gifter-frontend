@@ -10,8 +10,8 @@ export default function AppHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [currentUser, setCurrentUser] = useState<{ name: string; location: string }>({
-    name: "Alex K.",
-    location: "Melen • UY1",
+    name: "Mon Compte",
+    location: "Yaoundé",
   });
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const pathname = usePathname();

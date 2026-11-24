@@ -96,7 +96,7 @@ export default function ProfilPage() {
       <main className="flex-1 pt-24 pb-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-8">
           <ProfileCard
-            username={displayName || "Alex Kamga"}
+            username={displayName || "Mon Profil Citoyen"}
             city={profile?.city || "Yaoundé"}
             neighborhood={profile?.neighborhood || "Melen"}
             donationsCount={myDonations.length}
