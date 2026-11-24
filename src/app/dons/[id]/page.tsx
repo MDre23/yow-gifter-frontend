@@ -1,5 +1,5 @@
 import DonationDetailClient from "./DonationDetailClient";
-
+export const dynamic = 'force-dynamic';
 export default async function DonationDetailPage({
   params,
 }: {
