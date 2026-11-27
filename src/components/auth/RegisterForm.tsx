@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { authService } from "@/services/auth.service";
 
@@ -21,7 +21,7 @@ const cities = [
   "Dschang",
   "Foumban",
   "Kumba",
-];
+] as const;
 
 const neighborhoodsByCity: Record<string, string[]> = {
   Yaoundé: [
@@ -65,56 +65,196 @@ const neighborhoodsByCity: Record<string, string[]> = {
   default: ["Centre-ville", "Quartier résidentiel", "Autre"],
 };
 
+/** Limites strictes */
+const LIMITS = {
+  username: { min: 3, max: 30 },
+  firstName: { min: 2, max: 50 },
+  lastName: { min: 2, max: 50 },
+  email: { max: 100 },
+  password: { min: 8, max: 64 },
+  phone: { min: 9, max: 9 }, // 9 chiffres (sans indicatif)
+  age: { min: 16, max: 99 },
+} as const;
+
+/** Nettoyage basique : trim + suppression caractères de contrôle */
+function sanitizeText(value: string): string {
+  return value.replace(/[\u0000-\u001F\u007F]/g, "").trim();
+}
+
+/** Username : lettres, chiffres, underscore, tiret uniquement */
+function isValidUsername(value: string): boolean {
+  return /^[a-zA-Z0-9_-]+$/.test(value);
+}
+
+/** Prénom / Nom : lettres (accents OK), espaces, tirets, apostrophes */
+function isValidName(value: string): boolean {
+  return /^[a-zA-ZÀ-ÿ\s'-]+$/.test(value);
+}
+
+/** Email simple mais strict */
+function isValidEmail(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value) && !value.includes("..");
+}
+
+/** Téléphone Cameroun : 9 chiffres, commence par 6 */
+function isValidCameroonPhone(digits: string): boolean {
+  return /^6\d{8}$/.test(digits);
+}
+
+/** Mot de passe : min 8, au moins 1 lettre et 1 chiffre */
+function isValidPassword(value: string): boolean {
+  return (
+    value.length >= LIMITS.password.min &&
+    value.length <= LIMITS.password.max &&
+    /[a-zA-Z]/.test(value) &&
+    /\d/.test(value)
+  );
+}
+
+/** Ne garde que les chiffres */
+function onlyDigits(value: string): string {
+  return value.replace(/\D/g, "");
+}
+
+type FieldErrors = Partial<
+  Record<
+    | "username"
+    | "firstName"
+    | "lastName"
+    | "age"
+    | "phone"
+    | "email"
+    | "password"
+    | "neighborhood"
+    | "charte",
+    string
+  >
+>;
+
 export default function RegisterForm() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [selectedCity, setSelectedCity] = useState("Yaoundé");
+  const [selectedCity, setSelectedCity] = useState<string>("Yaoundé");
   const [username, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState(""); // stocké en chiffres uniquement
   const [neighborhood, setNeighborhood] = useState("Melen");
-  const [age, setAge] = useState<number | undefined>(22);
+  const [age, setAge] = useState("");
+  const [charteAccepted, setCharteAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
-  const neighborhoods =
-    neighborhoodsByCity[selectedCity] || neighborhoodsByCity.default;
+  const neighborhoods = useMemo(
+    () => neighborhoodsByCity[selectedCity] || neighborhoodsByCity.default,
+    [selectedCity]
+  );
+
+  const validate = (): FieldErrors => {
+    const errors: FieldErrors = {};
+
+    const u = sanitizeText(username);
+    if (u.length < LIMITS.username.min || u.length > LIMITS.username.max) {
+      errors.username = `Entre ${LIMITS.username.min} et ${LIMITS.username.max} caractères.`;
+    } else if (!isValidUsername(u)) {
+      errors.username = "Lettres, chiffres, _ et - uniquement.";
+    }
+
+    const fn = sanitizeText(firstName);
+    if (fn.length < LIMITS.firstName.min || fn.length > LIMITS.firstName.max) {
+      errors.firstName = `Entre ${LIMITS.firstName.min} et ${LIMITS.firstName.max} caractères.`;
+    } else if (!isValidName(fn)) {
+      errors.firstName = "Caractères non autorisés.";
+    }
+
+    const ln = sanitizeText(lastName);
+    if (ln.length < LIMITS.lastName.min || ln.length > LIMITS.lastName.max) {
+      errors.lastName = `Entre ${LIMITS.lastName.min} et ${LIMITS.lastName.max} caractères.`;
+    } else if (!isValidName(ln)) {
+      errors.lastName = "Caractères non autorisés.";
+    }
+
+    const ageNum = parseInt(age, 10);
+    if (!age || Number.isNaN(ageNum)) {
+      errors.age = "Âge obligatoire.";
+    } else if (ageNum < LIMITS.age.min || ageNum > LIMITS.age.max) {
+      errors.age = `Entre ${LIMITS.age.min} et ${LIMITS.age.max} ans.`;
+    }
+
+    if (!isValidCameroonPhone(phone)) {
+      errors.phone = "Numéro camerounais invalide (9 chiffres, commence par 6).";
+    }
+
+    const em = sanitizeText(email).toLowerCase();
+    if (!em || em.length > LIMITS.email.max) {
+      errors.email = "E-mail obligatoire (max 100 caractères).";
+    } else if (!isValidEmail(em)) {
+      errors.email = "Format d'e-mail invalide.";
+    }
+
+    if (!neighborhood) {
+      errors.neighborhood = "Sélectionnez un quartier.";
+    }
+
+    if (!isValidPassword(password)) {
+      errors.password =
+        "Min. 8 caractères, au moins une lettre et un chiffre (max 64).";
+    }
+
+    if (!charteAccepted) {
+      errors.charte = "Vous devez accepter la charte.";
+    }
+
+    return errors;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
 
+    const errors = validate();
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) return;
+
+    setLoading(true);
     try {
-      // Appel réel à l'API Spring Boot
       await authService.register({
-        email,
-        password,
-        username,
-        firstName: firstName || username,
-        lastName: lastName || "Citoyen",
+        email: sanitizeText(email).toLowerCase(),
+        password, // ne pas "sanitizer" le mot de passe (caractères spéciaux utiles)
+        username: sanitizeText(username),
+        firstName: sanitizeText(firstName),
+        lastName: sanitizeText(lastName),
         neighborhood: `${selectedCity} - ${neighborhood}`,
-        phone,
-        age,
+        phone: `+237${phone}`, // format international côté API
+        age: parseInt(age, 10),
       });
       router.push("/explorer");
     } catch (err: unknown) {
-      // Affichage de la vraie erreur (ex: "Email déjà utilisé")
-      const msg = err instanceof Error ? err.message : "Erreur lors de l'inscription";
+      const msg =
+        err instanceof Error ? err.message : "Email ou mot de passe incorrect.";
       setError(msg);
     } finally {
       setLoading(false);
     }
   };
 
+  const inputClass =
+    "w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500";
+  const inputClassNoIcon =
+    "w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500";
+  const errorText = "text-xs text-red-600 mt-1 font-medium";
+
   return (
     <div className="h-[380px] overflow-y-auto pr-1 custom-scrollbar">
-      <form className="space-y-4" onSubmit={handleSubmit}>
+      <form className="space-y-4" onSubmit={handleSubmit} noValidate>
         {error && (
-          <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold">
+          <div
+            role="alert"
+            className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold"
+          >
             {error}
           </div>
         )}
@@ -128,17 +268,26 @@ export default function RegisterForm() {
             <img
               src="/icons/user-solid.svg"
               alt=""
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50"
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50 pointer-events-none"
             />
             <input
               type="text"
               required
+              autoComplete="username"
+              maxLength={LIMITS.username.max}
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Ex: Marie_K ou Paul_Citoyen"
-              className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500"
+              onChange={(e) => {
+                // Filtre immédiat : caractères autorisés seulement
+                const v = e.target.value.replace(/[^a-zA-Z0-9_-]/g, "");
+                setUsername(v.slice(0, LIMITS.username.max));
+              }}
+              placeholder="Ex: Marie_K"
+              className={inputClass}
             />
           </div>
+          {fieldErrors.username && (
+            <p className={errorText}>{fieldErrors.username}</p>
+          )}
         </div>
 
         {/* Prénom & Nom */}
@@ -150,24 +299,46 @@ export default function RegisterForm() {
             <input
               type="text"
               required
+              autoComplete="given-name"
+              maxLength={LIMITS.firstName.max}
               value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
+              onChange={(e) =>
+                setFirstName(
+                  e.target.value
+                    .replace(/[^a-zA-ZÀ-ÿ\s'-]/g, "")
+                    .slice(0, LIMITS.firstName.max)
+                )
+              }
               placeholder="Ex: Marie"
-              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500"
+              className={inputClassNoIcon}
             />
+            {fieldErrors.firstName && (
+              <p className={errorText}>{fieldErrors.firstName}</p>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
-              Nom (masqué au public)
+              Nom (masqué)
             </label>
             <input
               type="text"
               required
+              autoComplete="family-name"
+              maxLength={LIMITS.lastName.max}
               value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
+              onChange={(e) =>
+                setLastName(
+                  e.target.value
+                    .replace(/[^a-zA-ZÀ-ÿ\s'-]/g, "")
+                    .slice(0, LIMITS.lastName.max)
+                )
+              }
               placeholder="Ex: Mvesso"
-              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500"
+              className={inputClassNoIcon}
             />
+            {fieldErrors.lastName && (
+              <p className={errorText}>{fieldErrors.lastName}</p>
+            )}
           </div>
         </div>
 
@@ -178,16 +349,22 @@ export default function RegisterForm() {
           </label>
           <input
             type="number"
-            min={16}
-            max={99}
-            value={age || ""}
-            onChange={(e) => setAge(parseInt(e.target.value) || undefined)}
+            required
+            min={LIMITS.age.min}
+            max={LIMITS.age.max}
+            inputMode="numeric"
+            value={age}
+            onChange={(e) => {
+              const digits = onlyDigits(e.target.value).slice(0, 2);
+              setAge(digits);
+            }}
             placeholder="Ex: 24"
-            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500"
+            className={inputClassNoIcon}
           />
+          {fieldErrors.age && <p className={errorText}>{fieldErrors.age}</p>}
         </div>
 
-        {/* Téléphone */}
+        {/* Téléphone — chiffres uniquement */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">
             Numéro de téléphone
@@ -196,16 +373,28 @@ export default function RegisterForm() {
             <img
               src="/icons/phone-solid.svg"
               alt=""
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50"
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50 pointer-events-none"
             />
+            <span className="absolute left-10 top-1/2 -translate-y-1/2 text-xs text-slate-500 font-medium select-none">
+              +237
+            </span>
             <input
               type="tel"
+              inputMode="numeric"
+              autoComplete="tel-national"
+              maxLength={9}
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="Ex: 6XX XX XX XX"
-              className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500"
+              onChange={(e) => {
+                const digits = onlyDigits(e.target.value).slice(0, 9);
+                setPhone(digits);
+              }}
+              placeholder="6XX XX XX XX"
+              className="w-full pl-[4.5rem] pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500"
             />
           </div>
+          {fieldErrors.phone && (
+            <p className={errorText}>{fieldErrors.phone}</p>
+          )}
         </div>
 
         {/* Email */}
@@ -217,17 +406,24 @@ export default function RegisterForm() {
             <img
               src="/icons/envelope-solid.svg"
               alt=""
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50"
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50 pointer-events-none"
             />
             <input
               type="email"
               required
+              autoComplete="email"
+              maxLength={LIMITS.email.max}
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) =>
+                setEmail(e.target.value.slice(0, LIMITS.email.max))
+              }
               placeholder="votre.email@domaine.com"
-              className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500"
+              className={inputClass}
             />
           </div>
+          {fieldErrors.email && (
+            <p className={errorText}>{fieldErrors.email}</p>
+          )}
         </div>
 
         {/* Ville */}
@@ -244,7 +440,13 @@ export default function RegisterForm() {
             <select
               required
               value={selectedCity}
-              onChange={(e) => setSelectedCity(e.target.value)}
+              onChange={(e) => {
+                const city = e.target.value;
+                setSelectedCity(city);
+                const list =
+                  neighborhoodsByCity[city] || neighborhoodsByCity.default;
+                setNeighborhood(list[0] ?? "");
+              }}
               className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 appearance-none"
             >
               {cities.map((city) => (
@@ -265,7 +467,7 @@ export default function RegisterForm() {
             required
             value={neighborhood}
             onChange={(e) => setNeighborhood(e.target.value)}
-            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500"
+            className={inputClassNoIcon}
           >
             <option value="">Sélectionner un quartier</option>
             {neighborhoods.map((n) => (
@@ -274,6 +476,9 @@ export default function RegisterForm() {
               </option>
             ))}
           </select>
+          {fieldErrors.neighborhood && (
+            <p className={errorText}>{fieldErrors.neighborhood}</p>
+          )}
           <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
             <img
               src="/icons/shield-alt-solid.svg"
@@ -293,21 +498,28 @@ export default function RegisterForm() {
             <img
               src="/icons/key-solid.svg"
               alt=""
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50"
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50 pointer-events-none"
             />
             <input
               type={showPassword ? "text" : "password"}
               required
-              minLength={6}
+              autoComplete="new-password"
+              minLength={LIMITS.password.min}
+              maxLength={LIMITS.password.max}
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Au moins 6 caractères"
+              onChange={(e) =>
+                setPassword(e.target.value.slice(0, LIMITS.password.max))
+              }
+              placeholder="Min. 8 caractères, lettre + chiffre"
               className="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
+              aria-label={
+                showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"
+              }
             >
               <img
                 src={
@@ -320,13 +532,17 @@ export default function RegisterForm() {
               />
             </button>
           </div>
+          {fieldErrors.password && (
+            <p className={errorText}>{fieldErrors.password}</p>
+          )}
         </div>
 
         {/* Charte */}
         <label className="flex items-start gap-2 cursor-pointer select-none">
           <input
             type="checkbox"
-            required
+            checked={charteAccepted}
+            onChange={(e) => setCharteAccepted(e.target.checked)}
             className="w-4 h-4 mt-0.5 rounded accent-emerald-600"
           />
           <span className="text-sm text-slate-600">
@@ -340,13 +556,20 @@ export default function RegisterForm() {
             et de réemploi solidaire.
           </span>
         </label>
+        {fieldErrors.charte && (
+          <p className={errorText}>{fieldErrors.charte}</p>
+        )}
 
         <button
           type="submit"
           disabled={loading}
           className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 disabled:opacity-70"
         >
-          <span>{loading ? "Création du compte..." : "Créer mon compte & Accéder à l'application"}</span>
+          <span>
+            {loading
+              ? "Création du compte..."
+              : "Créer mon compte & Accéder à l'application"}
+          </span>
           <img
             src="/icons/check-solid.svg"
             alt=""

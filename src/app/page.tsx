@@ -55,7 +55,7 @@ export default function HomePage() {
       <Header />
       <main className="pt-28">
         <Hero />
-        <ImpactMetrics />
+        
         <Categories />
         <ProductGrid initialProducts={LOCAL_DUMMY_PRODUCTS} />
         <HowItWorks />

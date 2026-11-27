@@ -22,8 +22,7 @@ export default function LoginForm() {
       await authService.login(email, password);
       router.push("/explorer");
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Erreur de connexion";
-      // On affiche l'erreur, sans faux système de secours
+      const msg = err instanceof Error ? err.message : "Email ou mot de passe incorrect.";
       setError(msg);
     } finally {
       setLoading(false);

@@ -6,6 +6,22 @@ interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | undefined | null>;
 }
 
+export class ApiError extends Error {
+  status: number;
+
+  constructor(status: number, message: string) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
+}
+
+const CREDENTIALS_MESSAGE = "Email ou mot de passe incorrect.";
+
+function isAuthEndpoint(endpoint: string): boolean {
+  return endpoint.includes("/auth/login") || endpoint.includes("/auth/register");
+}
+
 export async function apiRequest<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
   let url = `${API_BASE_URL}${endpoint}`;
 
@@ -50,7 +66,14 @@ export async function apiRequest<T>(endpoint: string, options: RequestOptions = 
     } catch {
       // Pas de JSON d'erreur
     }
-    throw new Error(errorMessage);
+    if (
+      isAuthEndpoint(endpoint) &&
+      (response.status === 401 || response.status === 403) &&
+      errorMessage.startsWith("Erreur HTTP")
+    ) {
+      errorMessage = CREDENTIALS_MESSAGE;
+    }
+    throw new ApiError(response.status, errorMessage);
   }
 
   if (response.status === 204) {

@@ -20,6 +20,7 @@ export default function ExplorerPage() {
   const [selectedNeighborhood, setSelectedNeighborhood] = useState<string>("all");
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [isLiveApi, setIsLiveApi] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchLiveDonations() {
@@ -50,7 +51,9 @@ export default function ExplorerPage() {
           setIsLiveApi(true);
         }
       } catch (error) {
-        console.error("Erreur de chargement de l'API", error);
+        const msg = error instanceof Error ? error.message : "Email ou mot de passe incorrect.";
+        const refused = msg.startsWith("Erreur HTTP 401") || msg.startsWith("Erreur HTTP 403");
+        setLoadError(refused ? "Email ou mot de passe incorrect." : msg);
       }
     }
     fetchLiveDonations();
@@ -80,6 +83,11 @@ export default function ExplorerPage() {
       <AppHeader />
       <main className="flex-1 pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
+          {loadError && (
+            <div role="alert" className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-semibold">
+              {loadError}
+            </div>
+          )}
           <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-xs border border-slate-100 mb-6">
             <ExplorerBanner searchQuery={searchQuery} onChangeSearch={setSearchQuery} />
             <CategoryPills selectedCategory={selectedCategory} totalCount={donations.length} onSelectCategory={setSelectedCategory} />

@@ -102,7 +102,7 @@ export default function Hero() {
           <div className="hidden lg:flex lg:col-span-5 justify-center items-center h-full">
             <div className="relative w-full h-[520px] lg:h-[580px] rounded-2xl overflow-hidden shadow-xl border border-slate-200 bg-slate-50">
               <img
-                src="/images/imgf_objets.png"
+                src="/images/imgf.png"
                 alt="Partage d'objets et solidarité citoyenne"
                 className="w-full h-full object-cover object-center transform hover:scale-105 transition-transform duration-500"
               />
