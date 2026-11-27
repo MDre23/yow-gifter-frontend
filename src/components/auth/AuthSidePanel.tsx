@@ -1,66 +1,43 @@
 export default function AuthSidePanel() {
-    return (
-      <div className="lg:col-span-5 flex flex-col justify-between rounded-2xl bg-emerald-50/60 p-6 lg:p-8 relative overflow-hidden border border-emerald-100 h-[640px]">
-        <div className="absolute -right-8 -bottom-8 w-60 h-60 bg-emerald-200/40 rounded-full blur-2xl pointer-events-none" />
-  
-        <div>
-          
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 leading-tight">
-            Rejoignez une communauté bienveillante et solidaire.
-          </h2>
-          <p className="text-slate-600 mt-3 text-sm leading-relaxed">
-            Donnez une seconde vie à vos objets du quotidien et trouvez ce dont
-            vous avez besoin auprès de familles et voisins de confiance.
+  return (
+    <div className="lg:col-span-7 flex flex-col justify-center space-y-5 text-white py-2">
+      <div>
+        <h2 className="text-4xl sm:text-5xl font-bold leading-tight tracking-tight">
+          Yow Gifter.
+        </h2>
+        <p className="text-lg sm:text-xl font-semibold text-[#E7F3EF] mt-2">
+          Rejoignez une communauté bienveillante et solidaire.
+        </p>
+        <p className="text-[#E7F3EF]/90 mt-3 text-sm sm:text-base max-w-xl leading-relaxed">
+          Donnez une seconde vie à vos objets du quotidien et trouvez ce dont
+          vous avez besoin auprès de familles et voisins de confiance. Chaque
+          échange participe au réemploi écologique et à l&apos;entraide locale,
+          sans intermédiaire ni frais.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 max-w-xl border-t border-white/20">
+        <div className="pt-2">
+          <h4 className="text-sm font-bold text-white">100% Solidaire</h4>
+          <p className="text-xs text-[#E7F3EF]/85 mt-1 leading-relaxed">
+            Réemploi local et entraide entre voisins.
           </p>
         </div>
-  
-        <div className="my-6 rounded-xl overflow-hidden shadow-sm bg-white">
-          <img
-            src="/images/imgf_objets.png"
-            alt="Illustration d'entraide et de don solidaire"
-            className="w-full h-auto object-cover"
-          />
+
+        <div className="pt-2">
+          <h4 className="text-sm font-bold text-white">Sans frais</h4>
+          <p className="text-xs text-[#E7F3EF]/85 mt-1 leading-relaxed">
+            Échanges directs, simples et gratuits.
+          </p>
         </div>
-  
-        <div className="space-y-3 bg-white/70 backdrop-blur-sm p-4 rounded-xl">
-          <div className="flex items-start gap-3">
-            
-            <div>
-              <h4 className="text-sm font-bold text-slate-900">
-                100% Solidaire & Citoyen
-              </h4>
-              <p className="text-xs text-slate-500">
-                Chaque échange participe au réemploi écologique et à
-                l&apos;entraide locale.
-              </p>
-            </div>
-          </div>
-  
-          <div className="flex items-start gap-3">
-            
-            <div>
-              <h4 className="text-sm font-bold text-slate-900">
-                Sans intermédiaire ni frais
-              </h4>
-              <p className="text-xs text-slate-500">
-                Discutez, convenez d&apos;un point de rencontre et transmettez
-                simplement.
-              </p>
-            </div>
-          </div>
-  
-          <div className="flex items-start gap-3">
-            
-            <div>
-              <h4 className="text-sm font-bold text-slate-900">
-                Protection stricte des données
-              </h4>
-              <p className="text-xs text-slate-500">
-                Aucune vente de données. Votre anonymat est garanti.
-              </p>
-            </div>
-          </div>
+
+        <div className="pt-2">
+          <h4 className="text-sm font-bold text-white">Données protégées</h4>
+          <p className="text-xs text-[#E7F3EF]/85 mt-1 leading-relaxed">
+            Anonymat et vie privée respectés.
+          </p>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
